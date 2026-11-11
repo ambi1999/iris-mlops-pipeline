@@ -26,10 +26,13 @@ Python 3.13 · uv · scikit-learn · FastAPI · pytest · Docker · GitHub Actio
 | `.github/dependabot.yml` | Weekly automated dependency-update pull requests |
 | `notebooks/01_mlops_demo.ipynb` | 15–20 min MLOps demo with presenter notes |
 | `notebooks/02_devops_demo.ipynb` | 15–20 min DevOps demo with presenter notes |
+| `docs/getting-started.md` | Step-by-step setup guide with every command explained |
 
 Every file is commented to explain what each command does.
 
 ## Setup
+
+> **New to uv, Git or Docker?** Follow the [step-by-step guide](docs/getting-started.md). It explains every command and includes a troubleshooting section.
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 
