@@ -1,0 +1,42 @@
+# ------------------------------------------------------------------
+# pyproject.toml — the project's "ID card": its name, the Python
+# version it needs, and the packages it depends on.
+#
+# uv reads this file. Common commands:
+#   uv sync            create .venv and install everything below
+#   uv add <pkg>       add a new app dependency (updates this file + uv.lock)
+#   uv add --dev <pkg> add a tool only needed for development
+#   uv lock --upgrade  move all packages to their newest allowed versions
+#
+# Here we only say "at least this version" (>=). The EXACT version of
+# every package, including hidden sub-dependencies like numpy, is
+# recorded in uv.lock, which uv generates. Always commit uv.lock.
+# ------------------------------------------------------------------
+
+[project]
+name = "iris-mlops-pipeline"
+version = "0.1.0"
+description = "End-to-end MLOps pipeline for an Iris classifier: train, test, package, automate."
+readme = "README.md"
+
+# Must match .python-version (which says 3.13). The upper limit stops
+# uv from silently picking a newer, untested Python.
+requires-python = ">=3.13,<3.14"
+
+# Packages the APP needs to run. These go into the Docker image.
+dependencies = [
+    "scikit-learn>=1.5.2",  # machine learning: trains and evaluates the model
+    "joblib>=1.4.2",        # saves the trained model to a file and loads it back
+    "fastapi>=0.115.0",     # web framework: turns the model into an HTTP API
+    "uvicorn>=0.30.6",      # web server that runs the FastAPI app
+]
+
+# Packages only needed while DEVELOPING (testing, notebooks).
+# `uv sync` installs these too; the Docker image skips them (--no-dev).
+[dependency-groups]
+dev = [
+    "pytest>=8.3.3",   # test runner for test_app.py
+    "httpx>=0.27.2",   # HTTP client used by FastAPI's TestClient in tests
+    "jupyter>=1.1.1",  # runs the .ipynb demo notebooks
+    "pandas>=2.2.3",   # shows the dataset as a table in the notebooks
+]

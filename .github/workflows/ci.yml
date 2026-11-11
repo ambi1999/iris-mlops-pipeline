@@ -1,0 +1,76 @@
+# ------------------------------------------------------------------
+# ci.yml — Step 5 of the pipeline: CONTINUOUS INTEGRATION (CI).
+#
+# GitHub reads every .yml file in .github/workflows/ and runs it
+# automatically on its own servers. You can watch each run in the
+# "Actions" tab of your GitHub repository.
+#
+# Structure: a workflow contains jobs -> a job contains steps.
+# If any step fails, the job stops and the run is marked red ❌.
+# ------------------------------------------------------------------
+
+# The name shown in the Actions tab (and in the README badge).
+name: ci
+
+# "on" = WHEN to run this workflow.
+on:
+  push:          # every time someone pushes commits to any branch
+  pull_request:  # every time a pull request is opened or updated
+
+jobs:
+  # A job ID we chose ourselves; any name works.
+  train-test-build:
+    # The kind of virtual machine GitHub starts for this job.
+    # It is brand new and empty every run, which proves the project
+    # works from scratch, not just on your laptop.
+    runs-on: ubuntu-latest
+
+    steps:
+      # "uses" runs a ready-made action from GitHub's marketplace.
+      # checkout downloads your repository's code onto the machine.
+      - uses: actions/checkout@v4
+
+      # Install uv. enable-cache remembers downloaded packages between
+      # runs, so later pipelines are much faster.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      # "run" executes a normal shell command, exactly like your terminal.
+      # uv sync reads .python-version, installs that Python, creates .venv
+      # and installs the exact package versions from uv.lock.
+      #   --locked  fail if uv.lock doesn't match pyproject.toml, which
+      #             catches "forgot to commit the updated lock file".
+      - name: Install Python and dependencies
+        run: uv sync --locked
+
+      # "uv run" runs a command inside the project's .venv.
+      # If accuracy is below the quality gate, train.py exits with an
+      # error and the pipeline stops here.
+      - name: Train model (fails if accuracy is too low)
+        run: uv run python train.py
+
+      # Run every test in test_app.py. One failing test = red pipeline.
+      - name: Run tests
+        run: uv run pytest -v
+
+      # Save the trained model and its metrics as downloadable files,
+      # attached to this run (look for "Artifacts" on the run's page).
+      - name: Upload model and metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: |
+            model.joblib
+            metrics.json
+
+      # Finally, prove the Docker image builds successfully.
+      # --build-arg passes the Python version from .python-version, so
+      # Docker and CI can never disagree about it.
+      # -t gives the image a name (a "tag"); "." means "use this folder".
+      - name: Build Docker image
+        run: >
+          docker build
+          --build-arg PYTHON_VERSION="$(cat .python-version)"
+          -t iris-mlops-pipeline .

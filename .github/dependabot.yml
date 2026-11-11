@@ -1,0 +1,34 @@
+# ------------------------------------------------------------------
+# dependabot.yml — GitHub's built-in robot that keeps versions fresh.
+#
+# Once a week it checks for newer versions and opens a pull request
+# for each update. Our CI pipeline then tests that pull request
+# automatically, so you only merge updates that pass.
+# Find them in your repository's "Pull requests" tab.
+# ------------------------------------------------------------------
+
+# Version of this config file format (always 2).
+version: 2
+
+updates:
+  # Python packages listed in pyproject.toml / uv.lock
+  - package-ecosystem: "uv"
+    directory: "/"           # where pyproject.toml lives
+    schedule:
+      interval: "weekly"
+    groups:
+      # Bundle all package updates into ONE weekly pull request
+      # instead of one per package, which keeps things tidy.
+      python-packages:
+        patterns: ["*"]
+
+  # The actions used in .github/workflows/ (checkout, setup-uv, ...)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+# Note: the Python version itself is NOT updated by Dependabot. You
+# upgrade it on purpose by editing .python-version (or running
+# `uv python pin 3.14`), then updating requires-python in
+# pyproject.toml and the default in the Dockerfile.

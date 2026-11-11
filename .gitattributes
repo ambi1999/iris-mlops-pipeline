@@ -1,0 +1,15 @@
+# ------------------------------------------------------------------
+# .gitattributes — tells Git how to handle line endings.
+#
+# Windows ends lines with CRLF; Linux and Mac use LF. Without a rule,
+# the same file can differ between machines. This makes Git store and
+# check out every text file with LF, so laptops, CI and Docker all
+# see identical files.
+# ------------------------------------------------------------------
+
+# Every file Git detects as text: always use LF line endings
+* text=auto eol=lf
+
+# Windows-only scripts must keep CRLF (none in this project yet)
+*.bat text eol=crlf
+*.cmd text eol=crlf

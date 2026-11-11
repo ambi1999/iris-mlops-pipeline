@@ -1,0 +1,27 @@
+# ------------------------------------------------------------------
+# .gitignore — files Git should NOT track or upload to GitHub.
+# Rule of thumb: commit the RECIPE (code), not things the recipe makes.
+# Note: comments must be on their own line in this file.
+#
+# DO commit: pyproject.toml, uv.lock and .python-version. Together they
+# let anyone recreate the exact environment with `uv sync`.
+# ------------------------------------------------------------------
+
+# Compiled Python files, created automatically
+__pycache__/
+
+# Local virtual environment: recreate it with `uv sync`
+.venv/
+
+# Trained model and its metrics: recreate them with `uv run python train.py`
+*.joblib
+metrics.json
+
+# pytest's local cache
+.pytest_cache/
+
+# Jupyter's autosave copies of notebooks
+.ipynb_checkpoints/
+
+# Temporary package list created by the notebooks when run in Google Colab
+colab-requirements.txt

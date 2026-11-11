@@ -1,0 +1,24 @@
+# ------------------------------------------------------------------
+# .dockerignore — files Docker should NOT copy into the image.
+# Works like .gitignore. Keeps the image small and builds fast.
+# Note: comments must be on their own line in this file.
+# ------------------------------------------------------------------
+
+# Python's compiled cache files, rebuilt automatically
+__pycache__/
+
+# Local model and metrics files: the image trains its own during the build
+*.joblib
+metrics.json
+
+# Your local virtual environment (can be hundreds of MB)
+.venv/
+
+# Git history isn't needed to run the app
+.git/
+
+# Demo notebooks are for people, not for production
+notebooks/
+
+# pytest's local cache
+.pytest_cache/
