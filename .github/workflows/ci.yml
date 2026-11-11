@@ -28,7 +28,7 @@ jobs:
     steps:
       # "uses" runs a ready-made action from GitHub's marketplace.
       # checkout downloads your repository's code onto the machine.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Install uv. enable-cache remembers downloaded packages between
       # runs, so later pipelines are much faster.
