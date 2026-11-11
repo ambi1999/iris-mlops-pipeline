@@ -57,7 +57,8 @@ Open http://localhost:8000/docs to try the API in your browser.
 ## Run the published image
 
 Every change that passes CI on `main` is automatically published to the
-GitHub Container Registry. Run the latest version without cloning anything:
+[GitHub Container Registry](https://github.com/users/ambi1999/packages/container/package/iris-mlops-pipeline).
+Run the latest version without cloning anything:
 
     docker run --rm -p 8000:8000 ghcr.io/ambi1999/iris-mlops-pipeline:latest
 
