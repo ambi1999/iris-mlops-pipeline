@@ -66,6 +66,8 @@ sample output there, since Colab can't run Docker.
 
 [![Open DevOps demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ambi1999/iris-mlops-pipeline/blob/main/notebooks/02_devops_demo.ipynb) DevOps demo
 
+Colab needs a free Google account. When it warns that the notebook "was not authored by Google", click **Run anyway**. To just read the notebooks without running them, open them directly on GitHub.
+
 ## Useful uv commands
 
 | Command | What it does |
