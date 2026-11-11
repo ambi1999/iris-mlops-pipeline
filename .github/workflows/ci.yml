@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------
-# ci.yml — Step 5 of the pipeline: CONTINUOUS INTEGRATION (CI).
+# ci.yml — the CI/CD pipeline.
 #
 # GitHub reads every .yml file in .github/workflows/ and runs it
 # automatically on its own servers. You can watch each run in the
@@ -7,6 +7,14 @@
 #
 # Structure: a workflow contains jobs -> a job contains steps.
 # If any step fails, the job stops and the run is marked red ❌.
+#
+# This workflow has TWO jobs:
+#   1. train-test-build  (CI) — runs on every push to main and every
+#                               pull request: train, test, build.
+#   2. publish           (CD) — runs ONLY on pushes to main, and ONLY
+#                               if job 1 passed: builds the Docker image
+#                               and publishes it to the GitHub Container
+#                               Registry (ghcr.io).
 # ------------------------------------------------------------------
 
 # The name shown in the Actions tab (and in the README badge).
@@ -14,11 +22,14 @@ name: ci
 
 # "on" = WHEN to run this workflow.
 on:
-  push:          # every time someone pushes commits to any branch
-  pull_request:  # every time a pull request is opened or updated
+  push:
+    branches: [main]  # pushes to the main branch only
+  pull_request:       # every pull request (this also covers Dependabot's updates)
 
 jobs:
-  # A job ID we chose ourselves; any name works.
+  # ================================================================
+  # JOB 1 — CI: prove the change works
+  # ================================================================
   train-test-build:
     # The kind of virtual machine GitHub starts for this job.
     # It is brand new and empty every run, which proves the project
@@ -65,7 +76,7 @@ jobs:
             model.joblib
             metrics.json
 
-      # Finally, prove the Docker image builds successfully.
+      # Prove the Docker image builds successfully.
       # --build-arg passes the Python version from .python-version, so
       # Docker and CI can never disagree about it.
       # -t gives the image a name (a "tag"); "." means "use this folder".
@@ -74,3 +85,73 @@ jobs:
           docker build
           --build-arg PYTHON_VERSION="$(cat .python-version)"
           -t iris-mlops-pipeline .
+
+  # ================================================================
+  # JOB 2 — CD: publish the tested image
+  # ================================================================
+  publish:
+    # "needs" = wait for job 1 and run only if it succeeded.
+    # A failed test or quality gate means nothing gets published.
+    needs: train-test-build
+
+    # Only publish from main. Pull requests are tested but never
+    # published, so unreviewed code can't reach the registry.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    # Permissions for the automatic GITHUB_TOKEN used below:
+    #   contents: read    read the code
+    #   packages: write   publish to the GitHub Container Registry
+    # Granting only what's needed is a security best practice.
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Read .python-version and save it as an output called "version",
+      # so later steps can use it (single source of truth again).
+      - name: Read Python version
+        id: python
+        run: echo "version=$(cat .python-version)" >> "$GITHUB_OUTPUT"
+
+      # Log in to the GitHub Container Registry (ghcr.io).
+      # GITHUB_TOKEN is created automatically for every run, so there's
+      # no password to set up or store.
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Work out the image's name and tags. Every image gets two tags:
+      #   latest       always points to the newest version
+      #   sha-1a2b3c4  the exact commit it was built from, so you can
+      #                trace any image back to its code, or roll back
+      #                by running an older tag
+      # It also adds labels that link the image to this repository.
+      - name: Generate image name and tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      # Build the image and push (upload) it to the registry.
+      # The gha cache reuses unchanged layers from earlier runs, so
+      # rebuilds are fast.
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: PYTHON_VERSION=${{ steps.python.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
