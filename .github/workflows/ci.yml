@@ -152,7 +152,7 @@ jobs:
       # The gha cache reuses unchanged layers from earlier runs, so
       # rebuilds are fast.
       - name: Build and push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: true
