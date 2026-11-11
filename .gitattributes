@@ -13,3 +13,6 @@
 # Windows-only scripts must keep CRLF (none in this project yet)
 *.bat text eol=crlf
 *.cmd text eol=crlf
+
+# Count notebooks as documentation in GitHub's language statistics
+notebooks/*.ipynb linguist-documentation
