@@ -54,6 +54,16 @@ Open http://localhost:8000/docs to try the API in your browser.
     docker build -t iris-mlops-pipeline .
     docker run -p 8000:8000 iris-mlops-pipeline
 
+## Run the published image
+
+Every change that passes CI on `main` is automatically published to the
+GitHub Container Registry. Run the latest version without cloning anything:
+
+    docker run --rm -p 8000:8000 ghcr.io/ambi1999/iris-mlops-pipeline:latest
+
+Each image is also tagged with the commit it was built from (for example
+`sha-1a2b3c4`), so any version can be traced back to its code or rolled back.
+
 ## Demo notebooks
 
 **Recommended:** open them in VS Code (with the Jupyter extension) and select
