@@ -4,7 +4,7 @@
 
 An end-to-end MLOps pipeline for an Iris flower classifier: model training with an
 accuracy quality gate, a FastAPI prediction service, automated tests, Docker
-packaging, and CI with GitHub Actions. Includes two presenter-ready notebooks
+packaging, and CI with GitHub Actions. Includes two self-contained notebooks
 that teach MLOps and DevOps concepts to beginners.
 
 ## Tech stack
@@ -24,8 +24,8 @@ Python 3.13 · uv · scikit-learn · FastAPI · pytest · Docker · GitHub Actio
 | `Dockerfile` | Packages the app and model into a container image |
 | `.github/workflows/ci.yml` | CI pipeline: train → test → upload model → build image |
 | `.github/dependabot.yml` | Weekly automated dependency-update pull requests |
-| `notebooks/01_mlops_demo.ipynb` | 15–20 min MLOps demo with presenter notes |
-| `notebooks/02_devops_demo.ipynb` | 15–20 min DevOps demo with presenter notes |
+| `notebooks/01_mlops_demo.ipynb` | 15–20 min MLOps walkthrough with explanations and exercises |
+| `notebooks/02_devops_demo.ipynb` | 15–20 min DevOps walkthrough with explanations and exercises |
 | `docs/getting-started.md` | Step-by-step setup guide with every command explained |
 
 Every file is commented to explain what each command does.
